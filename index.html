@@ -1,34 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>專屬於妳的備忘錄</title>
     <link rel="shortcut icon" href="./icon/notes.png" type="image/x-icon">
-    <link rel="stylesheet" href="./bootstrap/bootstrap.css">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .completed {
+            text-decoration: line-through;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1 class="mt-5">專屬於妳的備忘錄</h1>
+    <div id="app" class="container text-center">
+        <header class="my-5">
+            <h1>專屬於妳的備忘錄</h1>
+        </header>
+        <section>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">代辦事項</span>
+                </div>
+                <input type="text" class="form-control" placeholder="請輸入代辦事項" v-model="newTodo"
+                @keyup.enter="addTodo()">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" @click.prevent="addTodo()">新增</button>
+                </div>
+            </div>
+            <div class="card text-center">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs nav-fill">
+                        <li class="nav-item">
+                            <a class="nav-link" :class="{'active': status == 'all'}" href="#"
+                                @click.prevent="status = 'all'">全部</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" :class="{'active': status == 'unCompleted'}" href="#"
+                                @click.prevent="status = 'unCompleted'">未完成</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" :class="{'active': status == 'completed'}" href="#"
+                                @click.prevent="status = 'completed'">已完成</a>
+                        </li>
+                    </ul>
+                </div>
+                <ul class="list-group list-group-flush text-left">
+                    <template v-for="(item, index) in filterTodoList">
+                        <show-list :key="index" :data="item" @remove-todo="removeTodo(item)"
+                            @is-completed="isCompleted(item)" @cancel-edit="cancelEdit()">
+                        </show-list>
+                    </template>
+                </ul>
+                <div class="card-footer d-flex justify-content-between">
+                    <span>還有 {{ unCompleted }} 筆任務未完成</span>
+                    <a class="text-right" href="#" @click.prevent="removeAllTodo()">清除所有任務</a>
+                </div>
+            </div>
+        </section>
+    </div>
 
-        <div class="form-group">
-            <input id="memo-input" class="form-control memo-input" type="text" placeholder="輸入備忘內容">
-          </div>
-          <button id="add-button" class="btn btn-primary">新增</button>
-      
-          <ul id="memo-list" class="list-group mt-3"></ul>
-        </div>
-      
-    <script src="./jquery/jquery.js"></script>
-    <script src="./bootstrap/bootstrap.js"></script>
-    <script src="script.js"></script>
-    <script>
-        // 檢查本地存儲中是否有備忘錄資料，如果有則載入
-        if (localStorage.getItem("memos")) {
-          const memos = JSON.parse(localStorage.getItem("memos"));
-          memos.forEach(memo => createMemoElement(memo));
-        }
-      </script>
+    <script type="text/x-template" id="showList">
+        <li class="list-group-item" @dblclick.prevent="editTodoInComponent(data)">
+            <div class="form-check" v-if="data.id !== cacheTodo.id">
+                <input class="form-check-input" type="checkbox" v-model="data.isCompleted" @click="isCompletedInComponent(data)">
+                <label for="form-check-label" :class="{'completed': data.isCompleted}">{{ data.text }}</label>
+                <button class="close ml-auto" aria-label="Close" @click.prevent="removeTodoInComponent(data)">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <input type="text" class="form-control" v-model="cacheText" @keyup.esc="cancelEditInComponent()" @keyup.enter="doneEditInComponent(data)" v-if="data.id === cacheTodo.id">
+        </li>
+    </script>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="js/all.js"></script>
 </body>
 
 </html>
