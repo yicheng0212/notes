@@ -12,16 +12,23 @@
         <h1 class="mt-5">專屬於妳的備忘錄</h1>
 
         <div class="form-group">
-            <input id="memo-input" class="form-control memo-input" type="text" placeholder="輸入會忘記的內容" required>
+            <input id="memo-input" class="form-control memo-input" type="text" placeholder="輸入備忘內容">
           </div>
           <button id="add-button" class="btn btn-primary">新增</button>
       
           <ul id="memo-list" class="list-group mt-3"></ul>
-        </div>      
-
+        </div>
+      
     <script src="./jquery/jquery.js"></script>
     <script src="./bootstrap/bootstrap.js"></script>
     <script src="script.js"></script>
+    <script>
+        // 檢查本地存儲中是否有備忘錄資料，如果有則載入
+        if (localStorage.getItem("memos")) {
+          const memos = JSON.parse(localStorage.getItem("memos"));
+          memos.forEach(memo => createMemoElement(memo));
+        }
+      </script>
 </body>
 
 </html>
